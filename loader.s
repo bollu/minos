@@ -1,44 +1,33 @@
-GRUB_MAGIC_NUMBER equ 0x1BADB002     ; define the magic number constant
-GRUB_FLAGS        equ 0x0            ; multiboot flags
-GRUB_CHECKSUM     equ -GRUB_MAGIC_NUMBER  ; calculate the checksum
-                                ; (magic number + checksum + flags should equal 0)
-KERNEL_STACK_SIZE equ 4096
+# https://stackoverflow.com/tags/att/info
+# https://github.com/ErwinM/kernel/blob/630f10cf4f6ef8e26b2b9c8605c9996e2487a7f3/loader.s
+# https://www.youtube.com/watch?v=1rnA6wpF0o4&list=PLHh55M_Kq4OApWScZyPl5HhgsTJS9MZ6M&index=3
+# https://wiki.osdev.org/Multiboot#:~:text=The%20original%20Multiboot%20specification%20was,themselves%20with%20magic%20number%200x2BADB002.
+# https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html
+.set MAGIC, 0x1badb002
+.set FLAGS, (1<<0|1<<1)
+.set CHECKSUM, -(MAGIC+FLAGS)
 
+.section .multiboot
+  .long MAGIC
+  .long FLAGS
+  .long CHECKSUM
 
-global mboot	                  ; Make 'mboot' accessible from C.
-EXTERN code		                  ; Start of the '.text' section.
-EXTERN bss    	                ; Start of the .bss section.
-EXTERN end                      ; End of the last loadable section.
+.section .text
+.extern kernelMain 
+.global loader
 
-section .text
+loader:
+  mov $kernel_stack, %esp
+  push %eax # multiboot struct.
+  push %ebx # magic number.
+  call kernelMain
 
-mboot:
-    dd  GRUB_MAGIC_NUMBER				; GRUB will search for this value on each
-                                ; 4-byte boundary in your kernel file
-    dd  GRUB_FLAGS				      ; How GRUB should load your file / settings
-    dd  GRUB_CHECKSUM	          ; To ensure that the above values are correct
+stop:
+  cli
+  hlt
+  jmp stop
 
-    dd  mboot                   ; Location of this descriptor
-    dd  code                    ; Start of kernel '.text' (code) section.
-    dd  bss                     ; End of kernel '.data' section.
-    dd  end                     ; End of kernel.
-    dd  loader                  ; Kernel entry point (initial EIP).
+.section bss
+.space 2*1024*1024
+kernel_stack:
 
-
-global loader                   ; the entry symbol for ELF
-extern kmain
-loader:                         ; the loader label (defined as entry point in linker script)
-    mov esp, kernel_stack + KERNEL_STACK_SIZE
-		push ebx
-		;xchg bx, bx
-
-    call kmain
-
-.loop:
-		;xchg	bx, bx								; Enter debug through magic Bochs breakpoint
-    jmp .loop                   ; loop forever
-
-section .bss:
-align 4
-kernel_stack:                   ; label points to beginning of memory
-  resb KERNEL_STACK_SIZE        ; reserve stack for the kernel

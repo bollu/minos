@@ -1,18 +1,12 @@
-# https://www.youtube.com/watch?v=1rnA6wpF0o4&list=PLHh55M_Kq4OApWScZyPl5HhgsTJS9MZ6M&index=3
-.section .text
-# .extern kernelMain
-.global loader
+# run stuff in 32 bit more for simplicity.
+.PHONY: install
+install: mykernel.bin
+	sudo cp mykernel.bin /boot/mykernel.bin
 
-loader:
-	mov $kernel_stack: %esp
+mykernel.bin: linker.ld loader.o kernel.o
+	ld -melf_i386 -T linker.ld  -o mykernel.bin loader.o kernel.o
 
-stop:
-	cli
-	hlt
-	jmp stop
-
-
-.section .bss
-.space 2*1024*1024
-
-
+loader.o: loader.s
+	as --32 -o loader.o loader.s
+kernel.o: kernel.c
+	gcc -m32 -c kernel.c -o kernel.o -nostdlib -fno-builtin -fno-leading-underscore
