@@ -1,4 +1,5 @@
 /* https://github.com/ErwinM/kernel/blob/630f10cf4f6ef8e26b2b9c8605c9996e2487a7f3/link.ld */
+/* https://wiki.osdev.org/Bare_Bones */
 ENTRY(loader) /* entry label */
 /* find arch from https://docs.adacore.com/live/wave/binutils-stable/html/ld/ld.html#BFD */
 /* cooncretely, run `objdump -f loader.o` */
@@ -10,7 +11,9 @@ SECTIONS {
     /* . = 0x500000;          the code should be loaded at 5 MB */
     . = 1M;
 
-    .text ALIGN(4K)  : {
+    .text BLOCK(4K) : ALIGN(4K)
+    {
+        *(.multiboot)
         *(.text) 
         code = .; _code = .; __code = .;
 

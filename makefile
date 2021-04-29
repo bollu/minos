@@ -1,5 +1,15 @@
+# https://wiki.osdev.org/Bare_Bones
 # run stuff in 32 bit more for simplicity.
-.PHONY: run install clean ismultiboot
+.PHONY: run install clean iso
+
+# https://wiki.osdev.org/Bare_Bones -- booting a cdrom image
+iso: minos.bin
+	-rm -r ./isodir/
+	mkdir -p isodir/boot/grub
+	cp minos.bin isodir/boot/minos.bin
+	cp grub.cfg isodir/boot/grub/grub.cfg
+	grub-mkrescue -o minos.iso isodir
+	qemu-system-i386 -cdrom minos.iso
 
 run: minos.bin
 	qemu-system-i386 -kernel minos.bin
@@ -9,17 +19,16 @@ install: minos.bin
 
 # ld get ligst of archs with ld -V
 minos.bin: linker.ld loader.o kernel.o
-	ld -nostdlib -melf_i386 -T linker.ld  -o minos.bin loader.o kernel.o
-	# ld -nostdlib -melf_x86_64 -T linker.ld  -o minos.bin loader.o kernel.o
+	ld -melf_i386 -T linker.ld  -o minos.bin loader.o kernel.o
+	grub-file --is-x86-multiboot minos.bin
 
 loader.o: loader.s
 	as --32 -o loader.o loader.s
 kernel.o: kernel.c
-	gcc -m32 -c kernel.c -o kernel.o -fno-stack-protector  -nostdlib -fno-builtin -fno-leading-underscore -Os
-
-# 	https://wiki.osdev.org/Multiboot
-ismultiboot: minos.bin
-	grub-file --is-x86-multiboot minos.bin
+	gcc -m32 -c kernel.c -o kernel.o -ffreestanding -nostdlib -fno-builtin -fno-leading-underscore
 
 clean:
 	rm *.o *.bin
+
+
+
