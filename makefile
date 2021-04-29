@@ -9,15 +9,18 @@ iso: minos.bin
 	cp minos.bin isodir/boot/minos.bin
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o minos.iso isodir
-	qemu-system-i386 -cdrom minos.iso
+	qemu-system-x86_64 -cdrom minos.iso
+	# qemu-system-i386 -cdrom minos.iso
 
 run: minos.bin
-	qemu-system-i386 -kernel minos.bin
+	qemu-system-x86_64 -kernel minos.bin
+	# qemu-system-i386 -kernel minos.bin
 
 install: minos.bin
 	sudo cp minos.bin /boot/minos.bin
 
 # ld get ligst of archs with ld -V
+# # ld order matters, want loader to be first!
 minos.bin: linker.ld loader.o kernel.o
 	ld -melf_i386 -T linker.ld  -o minos.bin loader.o kernel.o
 	grub-file --is-x86-multiboot minos.bin
