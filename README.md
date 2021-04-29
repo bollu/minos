@@ -8,6 +8,7 @@
 
 
 
+
 # Step 1: adding kernel to grub CFG:
 
 
@@ -21,3 +22,12 @@ menuentry 'My OS'  {
 }
 
 ```
+
+# Tutorials
+
+- [Write an OS](https://www.youtube.com/watch?v=1rnA6wpF0o4&list=PLHh55M_Kq4OApWScZyPl5HhgsTJS9MZ6M&index=3)
+- [OSdev page on multiboot](https://wiki.osdev.org/Multiboot)
+- [GNU page on multiboot](https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html)
+- [`ErwinM/kernel` on github](https://github.com/ErwinM/kernel/)
+- http://www.osdever.net/bkerndev/index.php: longform tutorial.
+- https://www.cs.vu.nl/~herbertb/misc/writingkernels.txt: mini tutorial.
