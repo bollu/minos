@@ -5,7 +5,7 @@
 # https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html
 .set MAGIC, 0x1BADB002
 .set FLAGS, (1<<0|1<<1)
-.set CHECKSUM, -(MAGIC+FLAGS)
+.set CHECKSUM, -(MAGIC + FLAGS)
 
 .section .multiboot
   .align 4
@@ -18,15 +18,18 @@
 .global loader
 
 loader:
-  mov $kernel_stack, %esp
+  cli
+  mov $stack_top, %esp
+  mov 0, %ebp
   call kernelMain
-
 stop:
   cli
   hlt
   jmp stop
 
-.section bss
-.space 2*1024*1024
-kernel_stack:
+.section .bss
+.align 16
+stack_bottom:
+.skip 16384 # 16 KiB
+stack_top:
 

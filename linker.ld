@@ -15,20 +15,16 @@ SECTIONS {
     {
         *(.multiboot)
         *(.text) 
-        code = .; _code = .; __code = .;
 
     }
 
-    .data  ALIGN(4K) : {
+    .data  BLOCK(4K) : ALIGN(4K) {
         *(.data)
-        data = .; _data = .; __data = .;
 
     }
 
-    .bss ALIGN(4K) : {
-        *(COMMON)            /* all COMMON sections from all files */
+    .bss BLOCK(4K): ALIGN(4K) {
         *(.bss)
-        bss = .; _bss = .; __bss = .;
 
     }
 

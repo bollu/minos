@@ -22,7 +22,7 @@ install: minos.bin
 # ld get ligst of archs with ld -V
 # # ld order matters, want loader to be first!
 minos.bin: linker.ld loader.o kernel.o
-	ld -melf_i386 -T linker.ld  -o minos.bin loader.o kernel.o
+	ld -melf_i386 -T linker.ld  -o minos.bin loader.o kernel.o -z max-page-size=0x1000
 	grub-file --is-x86-multiboot minos.bin
 
 loader.o: loader.s
@@ -31,7 +31,7 @@ kernel.o: kernel.c
 	gcc -m32 -c kernel.c -o kernel.o -ffreestanding -nostdlib -fno-builtin -fno-leading-underscore
 
 clean:
-	rm *.o *.bin
+	rm *.o *.bin *.iso
 
 
 
