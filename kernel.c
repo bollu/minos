@@ -5,7 +5,8 @@ void print(const char *s) {
         videoMemory[2*i] = s[i];
     }
 }
-extern void kernelMain(void *multiboot, unsigned int magic) {
+// extern void kernelMain(void *multiboot, unsigned int magic) {
+extern void kernelMain() {
     print("Hello world! I am very happy to see you XXXXX");
     while(1) {};
 }
